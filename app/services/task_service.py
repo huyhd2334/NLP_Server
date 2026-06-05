@@ -5,7 +5,6 @@ import json
 import redis
 import hashlib
 
-
 load_dotenv()
 
 llm_client = OpenAI(
@@ -19,34 +18,60 @@ redis_client = redis.Redis(
     decode_responses=True
 )
 
+def safe_json_parse(data: str):
+
+    print("\n[DEBUG] RAW TYPE:", type(data))
+    print("[DEBUG] RAW DATA:", data)
+
+    parsed = data
+
+    for i in range(2): 
+        if isinstance(parsed, str):
+            try:
+                parsed = json.loads(parsed)
+                print(f"[DEBUG] AFTER json.loads level {i+1}:", type(parsed))
+            except Exception as e:
+                print("[DEBUG] JSON PARSE ERROR:", str(e))
+                break
+
+    print("[DEBUG] FINAL PARSED TYPE:", type(parsed))
+    print("[DEBUG] FINAL PARSED:", parsed)
+
+    return parsed
+
+
 async def task_generate_service(req):
-    # cache key
-    cache_key = "task" + hashlib.md5(req.encode()).hexdigest()
+    cache_key = "task:" + hashlib.md5(req.encode()).hexdigest()
     cached = redis_client.get(cache_key)
 
     if cached:
-        print("CACHED")
-        return json.loads(cached)
-    
-    print("CACHE MISS")
+        print("\n[DEBUG] CACHE HIT")
+        parsed = safe_json_parse(cached)
+
+        return {
+            "success": True,
+            "tasks": parsed.get("tasks") if isinstance(parsed, dict) else parsed
+        }
+
+    print("\n[DEBUG] CACHE MISS")
 
     prompt = f"""
-    Break this description into tasks:
-    only one task,
-    do not include "\n" between sentences,
-    max number of task 1, 2, .. on tasks <= 4 
-    Return ONLY valid JSON in this format:
-    {{
-      "tasks": [
-        "task 1",
-        "task 2",
-        "task 3"
-      ]
-    }}
-    No explanation, no markdown.
-    Description:
-    {req}
-    """
+        Break this description into tasks:
+        - only max 4 tasks
+        - no newline
+        - return ONLY valid JSON:
+
+        {{
+        "tasks": [
+            "task 1",
+            "task 2"
+        ]
+        }}
+
+        Description:
+        {req}
+        """
+
     try:
         response = llm_client.chat.completions.create(
             model="llama-3.1-8b-instant",
@@ -55,7 +80,7 @@ async def task_generate_service(req):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that breaks descriptions into structured tasks."
+                    "content": "You return ONLY valid JSON."
                 },
                 {
                     "role": "user",
@@ -63,12 +88,37 @@ async def task_generate_service(req):
                 }
             ]
         )
+
         raw = response.choices[0].message.content
 
-        redis_client.setex(cache_key, 3600, json.dumps(raw))
+        print("\n[DEBUG] GROQ RAW RESPONSE:", raw)
 
-        return json.loads(raw)
-    except Exception as e:
+        parsed = safe_json_parse(raw)
+
+        # validate final
+        if not isinstance(parsed, dict):
+            raise ValueError(f"Parsed result is not dict: {type(parsed)}")
+
+        if "tasks" not in parsed:
+            raise ValueError(f"Missing 'tasks' key: {parsed}")
+
+        # save cache
+        redis_client.setex(
+            cache_key,
+            3600,
+            json.dumps(parsed)
+        )
+        print("Response", {"success": True, "tasks": parsed["tasks"]})
+        
         return {
-            "error": f"Groq API error: {str(e)}"
+            "success": True,
+            "tasks": parsed["tasks"]
+        }
+
+    except Exception as e:
+        print("\n[ERROR]", str(e))
+
+        return {
+            "success": False,
+            "error": str(e)
         }
