@@ -1,4 +1,4 @@
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.models import Distance, VectorParams, PointStruct
 from app.core.qdrant import client
 from app.core.config import COLLECTION_NAME
 

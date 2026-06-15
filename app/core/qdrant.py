@@ -4,3 +4,6 @@ client = QdrantClient(
     host="localhost", 
     port=6333
 )
+
+
+
