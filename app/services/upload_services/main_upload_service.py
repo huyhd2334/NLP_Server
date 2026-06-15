@@ -10,11 +10,13 @@ from app.core.minio import minio_client
 from qdrant_client.models import PointStruct
 from app.core.qdrant import client
 
-async def main_upload_service(bucker_name: str, object_name: str, file_id: str):
+import uuid
+
+async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
 
     try:
         response = minio_client.get_object(
-           bucket_name = bucker_name,
+           bucket_name = bucket_name,
            object_name = object_name
         )
         file_bytes  = response.read()
@@ -46,8 +48,11 @@ async def main_upload_service(bucker_name: str, object_name: str, file_id: str):
     for i, chunk in enumerate(chunks):
         vector = embed(chunk)
 
+        seed_string = f"{file_id}_{i}"
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, seed_string))
+
         points.append(PointStruct(
-            id=f"{file_id}_{i}",
+            id=point_id,
             vector=vector,
             payload={
                 "file_id": file_id,
@@ -61,7 +66,4 @@ async def main_upload_service(bucker_name: str, object_name: str, file_id: str):
             collection_name = "documents-rag",
             points = points
         )
-        
-        count_vector += 1
-
-    return { "file_id": file_id, "chunks": len(points) }
+    return { "success": True, "file_id": file_id, "chunks": len(points) }
