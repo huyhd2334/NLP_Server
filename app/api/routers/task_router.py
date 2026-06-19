@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Header
 from app.controllers.task_controller import generate_task_controller
 from app.schemas.task_schema import task_generate_request
-import json
 routers = APIRouter()
 
 @routers.post("/generate-task")

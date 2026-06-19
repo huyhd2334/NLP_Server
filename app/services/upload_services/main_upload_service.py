@@ -46,7 +46,7 @@ async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
     # embed save
     points = []
     for i, chunk in enumerate(chunks):
-        vector = embed(chunk)
+        vector = await embed(chunk)
 
         seed_string = f"{file_id}_{i}"
         point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, seed_string))
@@ -62,8 +62,8 @@ async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
             }
         ))
 
-        client.upsert(
-            collection_name = "documents-rag",
-            points = points
-        )
+    client.upsert(
+        collection_name = "documents-rag",
+        points = points
+    )
     return { "success": True, "file_id": file_id, "chunks": len(points) }
