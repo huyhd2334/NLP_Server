@@ -25,7 +25,8 @@ async def search(query_embed, file_ids ,top_k):
     
     if not file_ids:
         query_filter = None
-
+        return []
+    
     else:
         print("file_ids", file_ids)
         file_ids = [str(x) for x in file_ids]

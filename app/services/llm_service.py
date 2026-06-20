@@ -19,8 +19,10 @@ async def llm_responser(query: str, chunks):
     
     if not chunks:
         return {
-            "success": False,
-            "message": "No relevant documents found"
+            "success": True,
+            "response": { "answer": "No relevant documents found",
+                          "sources": []
+                        }
         }
     context = "\n".join(chunk["text"] for chunk in chunks)
 
