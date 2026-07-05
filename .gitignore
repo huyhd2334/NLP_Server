@@ -33,3 +33,5 @@ models/
 Thumbs.db
 
 transformer/
+docs/
+output/

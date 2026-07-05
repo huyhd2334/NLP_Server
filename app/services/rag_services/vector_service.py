@@ -15,8 +15,9 @@ def init_qdrant():
                 distance=Distance.COSINE
             )
         )
-     
+
         print("Created collection documents-rag")
+        
     else:
         print("Collection documents already exists")
 

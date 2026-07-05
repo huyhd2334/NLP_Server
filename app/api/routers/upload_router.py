@@ -14,6 +14,7 @@ async def uploadRouter(req: UploadRequest):
             file_id=req.file_id
         )        
         return result
+    
     except Exception as e:
         print("[Error]: ", e)
         raise e

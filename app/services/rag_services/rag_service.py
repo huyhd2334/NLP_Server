@@ -1,5 +1,3 @@
-import array
-
 from app.services.llm_service import llm_responser
 from app.services.upload_services.embedding_service import embed
 from app.services.upload_services.chunking_service import chunk_text
@@ -20,5 +18,5 @@ async def RAG_responses(query: str, documents: list[str], top_k: int):
     llm_res = await llm_responser(query, chunks)
     print("[DEBUG] llm_res done", llm_res)
 
-    return llm_res
+    return llm_res, chunks
     
