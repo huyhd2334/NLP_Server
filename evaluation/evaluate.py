@@ -24,7 +24,7 @@ from ragas.run_config import RunConfig
 from datasets.arrow_writer import cast_to_python_objects
 
 files = glob.glob(r"D:\AI_road\Project\backend_projects\NLP_Server\output\*.csv")
-top_k = 10
+top_k = 5
 
 sem = asyncio.Semaphore(5)
 
@@ -38,6 +38,7 @@ judge = ChatOllama(
     temperature=0,
     format="json"
 )
+
 ragas_llm = LangchainLLMWrapper(judge)
 
 emb = OllamaEmbeddings(model="nomic-embed-text:latest")
