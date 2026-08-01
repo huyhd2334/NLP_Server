@@ -11,6 +11,8 @@ from app.core.qdrant import client
 
 import uuid
 
+from app.core.config import COLLECTION_NAME
+
 async def main_upload_service(file_bytes: str, object_name: str, file_id: str):
     # check file type
     file_type = detect_file_type(object_name)
@@ -48,7 +50,7 @@ async def main_upload_service(file_bytes: str, object_name: str, file_id: str):
         ))
 
     client.upsert(
-        collection_name = "documents-rag",
+        collection_name = COLLECTION_NAME,
         points = points
     )
     return { "success": True, "file_id": file_id, "chunks": len(points) }
