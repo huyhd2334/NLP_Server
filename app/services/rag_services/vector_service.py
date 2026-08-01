@@ -1,4 +1,4 @@
-from qdrant_client.models import Distance, VectorParams, Filter, FieldCondition, MatchAny
+from qdrant_client.models import (Distance, VectorParams, Filter, FieldCondition, MatchAny, PayloadSchemaType)
 from app.core.config import COLLECTION_NAME
 
 from app.core.qdrant import async_client
@@ -11,14 +11,14 @@ async def init_qdrant():
         if COLLECTION_NAME not in existing:
             await async_client.create_collection(
                 collection_name=COLLECTION_NAME,
-                vectors_config=VectorParams(
-                    size=3072,
-                    distance=Distance.COSINE
-                )
+                vectors_config=VectorParams(size=3072, distance=Distance.COSINE),
             )
-            print(f"Created collection {COLLECTION_NAME}")
-        else:
-            print(f"Collection {COLLECTION_NAME} already exists")
+
+        await async_client.create_payload_index(
+            collection_name=COLLECTION_NAME,
+            field_name="file_id",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
     except Exception as e:
         print(f"[WARN] Init Qdrant failed: {e}")
 
