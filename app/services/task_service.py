@@ -12,10 +12,9 @@ llm_client = OpenAI(
     base_url="https://api.groq.com/openai/v1"
 )
 
-redis_client = redis.Redis(
-    host="localhost",
-    port=6379,
-    decode_responses=True
+redis_client = redis.from_url(
+    os.getenv("REDIS_URL"),
+    decode_responses=True,
 )
 
 def safe_json_parse(data: str):

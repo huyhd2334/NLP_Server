@@ -1,12 +1,7 @@
-import asyncio
 from qdrant_client.models import Distance, VectorParams, Filter, FieldCondition, MatchAny
-from app.core.qdrant import client 
 from app.core.config import COLLECTION_NAME
 
-from qdrant_client import AsyncQdrantClient
-
-async_client = AsyncQdrantClient(url="http://localhost:6333", timeout=60.0)
-
+from app.core.qdrant import async_client
 
 async def init_qdrant():
     try:

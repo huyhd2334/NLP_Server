@@ -6,27 +6,12 @@ from app.utils.file_type import detect_file_type
 from app.services.upload_services.chunking_service import chunk_text
 from app.services.upload_services.embedding_service import embed
 
-from app.core.minio import minio_client
 from qdrant_client.models import PointStruct
 from app.core.qdrant import client
 
 import uuid
 
-async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
-
-    try:
-        response = minio_client.get_object(
-           bucket_name = bucket_name,
-           object_name = object_name
-        )
-        file_bytes  = response.read()
-        
-        response.close()
-        response.release_conn()
-
-    except Exception as e:
-        raise ValueError(f"Cannot load file from MinIO: {e}")
-
+async def main_upload_service(file_bytes: str, object_name: str, file_id: str):
     # check file type
     file_type = detect_file_type(object_name)
     

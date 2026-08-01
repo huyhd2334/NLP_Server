@@ -6,7 +6,7 @@ import gzip
 import re
 import asyncio
 from openai import AsyncOpenAI 
-import redis.asyncio as aioredis  
+import redis.asyncio as redis
 
 dotenv.load_dotenv()
 
@@ -29,7 +29,7 @@ current_key_index = 0
 def get_llm_client():
     global current_key_index
     active_key = GROQ_KEYS[current_key_index]
-    print(f"[INFO] 🔑 Using Groq API Key: {active_key[:8]}...")
+    print(f"[INFO] Using Groq API Key: {active_key[:8]}...")
     return AsyncOpenAI(
         api_key=active_key,
         base_url="https://api.groq.com/openai/v1"
@@ -49,16 +49,10 @@ def switch_to_next_key():
     return True
 
 
-redis_client = aioredis.Redis(
-    host="127.0.0.1",
-    port=6379,
-    decode_responses=False,  
-    socket_timeout=10,
-    socket_connect_timeout=10,
-    retry_on_timeout=True,
-    health_check_interval=30
+redis_client = redis.from_url(
+    os.getenv("REDIS_URL"),
+    decode_responses=False,
 )
-
 
 def safe_json_loads(text: str):
     text = text.strip()

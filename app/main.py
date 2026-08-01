@@ -13,7 +13,7 @@ app.include_router(router_rag)
 
 @app.on_event("startup")
 async def startup_event():
-    init_qdrant()
+    await init_qdrant()
 
 @app.get("/")
 def root():
