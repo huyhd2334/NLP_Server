@@ -138,6 +138,7 @@ async def llm_responser(query: str, chunks):
             try:
                 await redis_client.setex(
                     cache_key,
+                    3600,
                     gzip.compress(json.dumps(parsed).encode())
                 )
             except Exception as e:
