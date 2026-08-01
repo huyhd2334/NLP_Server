@@ -113,7 +113,10 @@ async def llm_responser(query: str, chunks):
         Return STRICT JSON ONLY:
         {{
         "answer": "...",
-        "sources": []
+        "sources": [
+            "Exact sentence or short quote from the context supporting the answer.",
+            "Another supporting sentence if needed."
+        ]
         }}
         """
 
