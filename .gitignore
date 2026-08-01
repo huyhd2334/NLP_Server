@@ -25,6 +25,7 @@ dataset/
 *.pth
 *.pt
 *.ckpt
+*.ipynb
 models/
 
 # OS
