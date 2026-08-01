@@ -1,0 +1,11 @@
+top_k = 3
+{'faithfulness': 0.7908, 'answer_relevancy': 0.5814, 'context_recall': 0.8685, 'llm_context_precision_with_reference': 0.6341}
+
+top_k = 5
+{'faithfulness': 0.8874, 'answer_relevancy': 0.7126, 'context_recall': 0.9184, '1lm_context_precision_with_reference': 0.6284}
+
+top_k = 10
+{'faithfulness': 0.8937, 'answer_relevancy': 0.5805, 'context_recall': 0.9849, 'llm_context_precision_with_reference': 0.5672}
+
+topk = 5 and overlap 20 words / chunk 100 words
+{'faithfulness': 0.8644, 'answer_relevancy': 0.5589, 'context_recall': 0.9329, 'llm_context_precision_with_reference': 0.6410}

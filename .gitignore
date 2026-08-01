@@ -20,7 +20,6 @@ env/
 # dataset (QUAN TRỌNG)
 data/
 dataset/
-*.txt
 
 # model weights
 *.pth

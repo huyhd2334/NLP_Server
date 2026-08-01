@@ -1,0 +1,15 @@
+# Web server
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Configuration and AI services
+python-dotenv
+openai
+redis
+qdrant-client
+sentence-transformers
+
+# Document parsing
+python-docx
+pdfplumber
