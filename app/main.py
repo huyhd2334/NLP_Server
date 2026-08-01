@@ -18,3 +18,7 @@ async def startup_event():
 @app.get("/")
 def root():
     return {"message": "AI Task System Running"}
+
+@app.head("/")
+def health_check():
+    return
