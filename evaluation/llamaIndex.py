@@ -45,7 +45,7 @@ splitter = RecursiveCharacterTextSplitter(
 )
 
 os.makedirs("output", exist_ok=True)
-for pdf in pdfs[7:]:
+for pdf in pdfs:
 
     print(f"Processing {os.path.basename(pdf)}")
 

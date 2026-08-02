@@ -4,4 +4,4 @@ import os
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-COLLECTION_NAME = "documents-rag"
+COLLECTION_NAME = "documents-rag-BAAI"

@@ -6,28 +6,23 @@ from app.utils.file_type import detect_file_type
 from app.services.upload_services.chunking_service import chunk_text
 from app.services.upload_services.embedding_service import embed
 
-from app.core.minio import minio_client
 from qdrant_client.models import PointStruct
 from app.core.qdrant import client
 
 import uuid
 
-async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
+import os 
+async def main_upload_service(file_path: str, file_id: str, is_query: bool = False):
 
     try:
-        response = minio_client.get_object(
-           bucket_name = bucket_name,
-           object_name = object_name
-        )
-        file_bytes  = response.read()
-        
-        response.close()
-        response.release_conn()
-
+        with open(file_path, 'rb') as f:
+            file_bytes = f.read()
+  
     except Exception as e:
-        raise ValueError(f"Cannot load file from MinIO: {e}")
+        raise ValueError(f"Cannot load file from Local: {e}")
 
     # check file type
+    object_name = os.path.basename(file_path)
     file_type = detect_file_type(object_name)
     
     # load text
@@ -46,7 +41,7 @@ async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
     # embed save
     points = []
     for i, chunk in enumerate(chunks):
-        vector = await embed(chunk)
+        vector = await embed(chunk, is_query)
 
         seed_string = f"{file_id}_{i}"
         point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, seed_string))
@@ -63,7 +58,7 @@ async def main_upload_service(bucket_name: str, object_name: str, file_id: str):
         ))
 
     client.upsert(
-        collection_name = "documents-rag",
+        collection_name = "documents-rag-BAAI",
         points = points
     )
     return { "success": True, "file_id": file_id, "chunks": len(points) }

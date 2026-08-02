@@ -17,7 +17,7 @@ async def init_qdrant():
             await async_client.create_collection(
                 collection_name=COLLECTION_NAME,
                 vectors_config=VectorParams(
-                    size=384,
+                    size=768,
                     distance=Distance.COSINE
                 )
             )
