@@ -61,8 +61,6 @@ You'll need the following services running locally (or reachable) before startin
 - **MinIO** — object storage, default `localhost:9000` (uploaded files must already exist in a MinIO bucket)
 - **Groq API key(s)** — for LLM access
 
-> Note: connection settings for Qdrant, Redis, and MinIO are currently hardcoded to `localhost`/`127.0.0.1` in `app/core/`. If you deploy these services elsewhere, update the corresponding files (`app/core/qdrant.py`, `app/core/minio.py`, `app/services/llm_service.py`, `app/services/task_service.py`) or refactor them to read from environment variables.
-
 ## Installation
 
 ```bash
@@ -76,8 +74,6 @@ pip install fastapi uvicorn python-dotenv openai redis \
             qdrant-client minio sentence-transformers \
             python-docx pdfplumber
 ```
-
-> This repository does not yet include a `requirements.txt`. The list above covers the packages imported across the codebase — consider generating and committing one (`pip freeze > requirements.txt`) for reproducible installs.
 
 ## Environment Variables
 
@@ -152,8 +148,6 @@ Breaks a natural-language description into a short list of tasks (max 4).
 { "description": "Plan a product launch for next month" }
 ```
 
-**Headers (optional):** `Authorization`, `X-User-Id`, `X-User-Name`
-
 **Response:**
 ```json
 {
@@ -205,25 +199,6 @@ The goal was to study the effect of three main parameters on RAG quality: **top_
 
 > Possible next steps: testing additional judge models to check the stability of the evaluation results, trying intermediate top_k values (7, 8) with the `bge-base` embedding, and evaluating the effect of larger chunk sizes (200–300 words) combined with reranking.
 
-## Integrating with a Frontend / Other Repo
-
-Since this server is meant to act as a backend for another web project, a typical integration flow looks like:
-
-1. Your frontend uploads a file to MinIO (directly or via your own backend) and calls `POST /upload` with the bucket/object name and a `file_id`.
-2. Your frontend calls `POST /rag-chat` with a user's question and the relevant `file_id`(s) to get a grounded answer.
-3. Optionally, `POST /generate-task` can be used anywhere in your app that needs to turn a text description into a task list.
-
-CORS is not yet configured in `app/main.py`; if your frontend runs on a different origin, add `fastapi.middleware.cors.CORSMiddleware` before deploying.
-
-## Known Issues / TODO
-
-- `README.md` and `docker_compose.yml` are currently empty — a Docker Compose setup (Qdrant + Redis + MinIO + this API) would simplify local development and deployment.
-- No `requirements.txt` / dependency lockfile yet.
-- Qdrant, Redis, and MinIO hosts/ports are hardcoded rather than read from `.env`.
-- `app/core/logger.py` has a bug (`logging.setLogger` should be `logging.getLogger`) that will raise an error if imported.
-- `app/middleware/*` is defined but not yet wired into the FastAPI app in `main.py`.
-- CORS middleware is not configured.
-- Evaluation currently uses a single judge model (Gemma3:4B) — additional judges should be tried to verify the stability of the results.
 
 ## Link demo on Render.com
 https://nlp-server-zr2m.onrender.com
