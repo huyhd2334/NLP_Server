@@ -23,8 +23,14 @@ from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.run_config import RunConfig
 from datasets.arrow_writer import cast_to_python_objects
 
+from langchain_groq import ChatGroq
+from ragas.llms import LangchainLLMWrapper
+
 files = glob.glob(r"D:\AI_road\Project\backend_projects\NLP_Server\output\*.csv")
-top_k = 10
+print(files)
+print(len(files))
+
+top_k = 5
 
 sem = asyncio.Semaphore(5)
 
@@ -33,12 +39,21 @@ run_config = RunConfig(
     max_workers=8
 )
 
+# === judge models ===
+
 judge = ChatOllama(
-    model="Gemma3:4B",
+    model="llama3.1:8b-instruct-q4_K_M",
     temperature=0,
     format="json"
 )
 ragas_llm = LangchainLLMWrapper(judge)
+
+# judge = ChatGroq(
+#     model="llama-3.3-70b-versatile",
+#     temperature=0,
+# )
+
+# ragas_llm = LangchainLLMWrapper(judge)
 
 emb = OllamaEmbeddings(model="nomic-embed-text:latest")
 ragas_emb = LangchainEmbeddingsWrapper(emb)
@@ -55,7 +70,7 @@ async def process_row(row, documents, top_k):
     except Exception:
         reference_contexts = []
 
-    prediction, chunks = await RAG_responses(query, documents, top_k)
+    prediction, chunks = await RAG_responses(query, documents, top_k, is_rerank=False)
     
     resp = prediction.get("response", {})
     answer = resp.get("answer", "") if isinstance(resp, dict) else str(resp)
@@ -74,9 +89,9 @@ async def process_row(row, documents, top_k):
 async def evaluate_def():
     all_samples = []
     
-    for file in files:
+    for i, file in enumerate(files):
         df = pd.read_csv(file)
-        documents = [int(file[-6:-4])]
+        documents = [int(i)]
         
         tasks = [process_row_with_semaphore(row, documents, top_k) for row in df.itertuples(index=False)]    
 

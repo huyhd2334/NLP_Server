@@ -194,7 +194,6 @@ async def llm_responser(query: str, chunks):
                 "error": err_msg
             }
             
-    # Kết thúc 5 lần thử lại mà vẫn không thành công
     return {
         "success": False,
         "error": "Failed after max retries due to rate limits."
