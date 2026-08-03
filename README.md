@@ -229,4 +229,3 @@ CORS is not yet configured in `app/main.py`; if your frontend runs on a differen
 https://nlp-server-zr2m.onrender.com
 
 ## License
-No license file is currently included in this repository. Add one (e.g. MIT) if you intend to share or open-source this project.
